@@ -1,0 +1,33 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "VoicevoxPlayer",
+	"Description": "",
+	"Category": "Other",
+	"CreatedBy": "Narcis Software",
+	"CreatedByURL": "https://happy-game-dev.undo.jp/",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "VoicevoxPlayer",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "RuntimeAudioImporter",
+			"Enabled": true
+		}
+	]
+}
