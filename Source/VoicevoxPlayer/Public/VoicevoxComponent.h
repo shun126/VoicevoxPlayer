@@ -1,12 +1,13 @@
 #pragma once
 #include <Components/ActorComponent.h>
+#include <RuntimeAudioImporterLibrary.h>
 #include "../ThirdParty/voicevox_core/voicevox_core.h"
 #include "VoiceVoxComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQueryEventSignature, const TArray<FString>&, answers);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FVoiceVoxQueryEventSignature, const TArray<FString>&, answers);
 
 UCLASS(Blueprintable, meta = (BlueprintSpawnableComponent))
-class UVoiceVoxComponent : public UActorComponent
+class VOICEVOXPLAYER_API UVoiceVoxComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -17,13 +18,22 @@ public:
 	// UActorComponent overrides
 	virtual void BeginPlay() override;
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		FString Message;
+	void OnAudioImporterResultNative(URuntimeAudioImporterLibrary* importer, UImportedSoundWave* importedSoundWave, ERuntimeImportStatus status);
+
+	void Play(const FString& message);
+	bool IsPlaying() const;
 
 private:
     void Initialzie();
     void Finalize();
 
-    void Play();
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		FString Message;
+
+	UPROPERTY(BlueprintReadOnly)
+		TObjectPtr<URuntimeAudioImporterLibrary> RuntimeAudioImporterLibrary2;
+
+	UPROPERTY(BlueprintReadOnly)
+		TObjectPtr<UAudioComponent> AudioComponent;
 };
