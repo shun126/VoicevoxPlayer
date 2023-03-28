@@ -65,36 +65,68 @@ public class VoicevoxPlayer : ModuleRules
             //CopyDll(exampleDllName, exampleDllFullPath);
             //RuntimeDependencies.Add(System.IO.Path.Combine(ModuleDirectory, "ThirdParty", "voicevox_core"));
             //PublicDelayLoadDLLs.Add("voicevox_core.dll");
-            PublicDelayLoadDLLs.Add(System.IO.Path.Combine(ModuleDirectory, "ThirdParty", "voicevox_core", "voicevox_core.dll"));
+            //PublicDelayLoadDLLs.Add(System.IO.Path.Combine(ModuleDirectory, "ThirdParty", "voicevox_core", "voicevox_core.dll"));
+        }
+
+        {
+            string voicevoxCorePath = System.IO.Path.Combine(ModuleDirectory, "ThirdParty", "voicevox_core");
+            string destinationPath = System.IO.Path.Combine(ModuleDirectory, "..", "..", "Binaries", "Win64");
+
+            CopyDirectory(voicevoxCorePath, destinationPath, "model", true);
+            CopyDirectory(voicevoxCorePath, destinationPath, "open_jtalk_dic_utf_8-1.11", true);
+            CopyFile(voicevoxCorePath, destinationPath, "voicevox_core.dll");
+            CopyFile(voicevoxCorePath, destinationPath, "onnxruntime.dll");
+            CopyFile(voicevoxCorePath, destinationPath, "onnxruntime_providers_shared.dll");
         }
     }
 
-
-    // Binariesà»â∫Ç…dll ÇÉRÉsÅ[Ç∑ÇÈ
-    private void CopyDll(string dllName, string dllFullPath)
+    private void CopyFile(string sourcePath, string destinationPath, string filename)
     {
-        if (!System.IO.File.Exists(dllFullPath))
-        {
-            System.Console.WriteLine("file {0} does not exist", dllName);
-            return;
-        }
-        string binariesDir = System.IO.Path.Combine(ModuleDirectory, "../../Binaries/Win64/");
-        if (!System.IO.Directory.Exists(binariesDir))
-        {
-            System.IO.Directory.CreateDirectory(binariesDir);
-        }
-        string binariesDllFullPath = System.IO.Path.Combine(binariesDir, dllName);
-        if (System.IO.File.Exists(binariesDllFullPath))
-        {
-            System.IO.File.SetAttributes(binariesDllFullPath, System.IO.File.GetAttributes(binariesDllFullPath) & ~System.IO.FileAttributes.ReadOnly);
-        }
+        string sourceFileName = System.IO.Path.Combine(sourcePath, filename);
+        string destinationFileName = System.IO.Path.Combine(destinationPath, filename);
         try
         {
-            System.IO.File.Copy(dllFullPath, binariesDllFullPath, true);
+            System.IO.File.Copy(sourceFileName, destinationFileName, true);
         }
         catch (System.Exception ex)
         {
-            System.Console.WriteLine("failed to copy file: {0}", dllName);
+            System.Console.WriteLine("failed to copy file: {0} to {1}", sourceFileName, destinationFileName);
+        }
+    }
+
+    static void CopyDirectory(string sourcePath, string destinationPath, string directoryName, bool recursive)
+    {
+        System.IO.DirectoryInfo sourceDirectory = new System.IO.DirectoryInfo(
+            System.IO.Path.Combine(sourcePath, directoryName)
+        );
+        System.IO.DirectoryInfo destinationDirectory = new System.IO.DirectoryInfo(
+            System.IO.Path.Combine(destinationPath, directoryName)
+        );
+
+        if (!sourceDirectory.Exists)
+        {
+            throw new System.IO.DirectoryNotFoundException($"Source directory not found: {sourceDirectory.FullName}");
+        }
+
+        if (!destinationDirectory.Exists)
+        {
+            destinationDirectory.Create();
+            destinationDirectory.Attributes = sourceDirectory.Attributes;
+        }
+
+        foreach (System.IO.FileInfo file in sourceDirectory.GetFiles())
+        {
+            string targetFilePath = System.IO.Path.Combine(destinationDirectory.FullName, file.Name);
+            file.CopyTo(targetFilePath, true);
+        }
+
+        if (recursive)
+        {
+            foreach (System.IO.DirectoryInfo subDirectory in sourceDirectory.GetDirectories())
+            {
+                string newDestinationDir = System.IO.Path.Combine(destinationDirectory.FullName, subDirectory.Name);
+                CopyDirectory(subDirectory.FullName, newDestinationDir, "", true);
+            }
         }
     }
 }
