@@ -1,5 +1,7 @@
 #include "VoicevoxManager.h"
 
+DEFINE_LOG_CATEGORY(VoicevoxPlayer);
+
 namespace voicevox
 {
 	std::weak_ptr<Manager> Manager::mInstance;
@@ -114,18 +116,12 @@ namespace voicevox
 				return result;
 			}
 
-			if (speakerId >= 0)
-			{
-				result = voicevox_load_model(static_cast<uint32_t>(speakerId));
-				if (result != VoicevoxResultCode::VOICEVOX_RESULT_OK)
-				{
-					voicevox_finalize();
-					return result;
-				}
-			}
-
-			mSpeakerId = speakerId;
 			mInitializePhase = InitializePhase::SystemInitialized;
+		}
+
+		if (mInitializePhase >= InitializePhase::SystemInitialized)
+		{
+			result = voicevox_load_model(static_cast<uint32_t>(speakerId));
 		}
 
 		return result;
@@ -134,11 +130,6 @@ namespace voicevox
 	bool Manager::IsInitialized() const noexcept
 	{
 		return mInitializePhase >= InitializePhase::SystemInitialized;
-	}
-
-	std::future<Result> Manager::Request(const std::string& message, const VoicevoxTtsOptions& ttsOptions, std::function<void(const Result&)> callback)
-	{
-		return Request(message, mSpeakerId, ttsOptions, callback);
 	}
 
 	std::future<Result> Manager::Request(const std::string& message, const int32_t speakerId, const VoicevoxTtsOptions& ttsOptions, std::function<void(const Result&)> callback)
