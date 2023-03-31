@@ -3,13 +3,11 @@ https://voicevox.hiroshiba.jp/
 https://github.com/VOICEVOX/voicevox_core/tree/main/example/cpp/windows
 */
 
-#include "VoiceVoxComponent.h"
+#include "VoicevoxPlayerComponent.h"
 #include "VoicevoxManager.h"
 #include "VoicevoxStringConverter.h"
 #include <AudioDevice.h>
 #include <Kismet/GameplayStatics.h>
-
-#define OPENJTALK_DICT_NAME TEXT("open_jtalk_dic_utf_8-1.11")
 
 #include <fstream>
 
@@ -17,20 +15,25 @@ https://github.com/VOICEVOX/voicevox_core/tree/main/example/cpp/windows
 #include <Misc/Paths.h>
 #endif
 
-UVoiceVoxComponent::UVoiceVoxComponent(const FObjectInitializer& objectInitializer)
+namespace
+{
+	static const FString OpenJTalkDictionaryName = TEXT("open_jtalk_dic_utf_8-1.11");
+}
+
+UVoicevoxPlayerComponent::UVoicevoxPlayerComponent(const FObjectInitializer& objectInitializer)
 	: Super(objectInitializer)
 {
 	mManager = voicevox::Manager::Instance();
 
-	RuntimeAudioImporterLibrary2 = objectInitializer.CreateDefaultSubobject<URuntimeAudioImporterLibrary>(this, TEXT("RuntimeAudioImporter"));
+	RuntimeAudioImporterLibrary = objectInitializer.CreateDefaultSubobject<URuntimeAudioImporterLibrary>(this, TEXT("RuntimeAudioImporter"));
 }
 
-UVoiceVoxComponent::~UVoiceVoxComponent()
+UVoicevoxPlayerComponent::~UVoicevoxPlayerComponent()
 {
 	mManager.reset();
 }
 
-void UVoiceVoxComponent::BeginPlay()
+void UVoicevoxPlayerComponent::BeginPlay()
 {
 	// 親クラスを呼び出し
 	Super::BeginPlay();
@@ -42,7 +45,7 @@ void UVoiceVoxComponent::BeginPlay()
 #elif _WIN32
 	openJTalkDictionaryPath = FPaths::Combine(openJTalkDictionaryPath, TEXT("Win32"));
 #endif
-	openJTalkDictionaryPath = FPaths::Combine(openJTalkDictionaryPath, OPENJTALK_DICT_NAME);
+	openJTalkDictionaryPath = FPaths::Combine(openJTalkDictionaryPath, OpenJTalkDictionaryName);
 
 	// VoicevoxManagerを初期化（初期化済みなら何もしない）
 	const VoicevoxResultCode result = mManager->Initialize(
@@ -50,37 +53,42 @@ void UVoiceVoxComponent::BeginPlay()
 		static_cast<int32_t>(SpeakerId)
 	);
 
-	FDelegateHandle h3 = RuntimeAudioImporterLibrary2->OnResultNative.AddUObject(this, &UVoiceVoxComponent::OnAudioImporterResultNative);
+	// 音声変換完了イベントの登録
+	RuntimeAudioImportResult = RuntimeAudioImporterLibrary->OnResultNative.AddUObject(this, &UVoicevoxPlayerComponent::OnAudioImporterResultNative);
 }
 
-void UVoiceVoxComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UVoicevoxPlayerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	// RuntimeAudioImporterLibrary2.Remove(h4);
+	// 音声変換完了イベントの解除
+	if (IsValid(RuntimeAudioImporterLibrary))
+	{
+		RuntimeAudioImporterLibrary->OnResultNative.Remove(RuntimeAudioImportResult);
+	}
 
 	// 親クラスを呼び出し
 	Super::EndPlay(EndPlayReason);
 }
 
-void UVoiceVoxComponent::Play(const FString& message)
+void UVoicevoxPlayerComponent::Play(const FString& message)
 {
 	std::string speechText(voicevox::windows::ToUTF8(*message).Get());
 	VoicevoxTtsOptions ttsOptions = voicevox_make_default_tts_options();
 	
-	UE_LOG(LogTemp, Log, TEXT("UVoiceVoxComponent::Play %s"), *message);
+	VOICEVOX_PLAYER_COMMUNICATOR_LOG(TEXT("Play %s"), *message);
 	mProcessing = true;
-	mManager->Request(speechText, ttsOptions, [this](const voicevox::Result& voicevoxResult)
+	mManager->Request(speechText, static_cast<int32_t>(SpeakerId), ttsOptions, [this](const voicevox::Result& voicevoxResult)
 		{
 			TArray<uint8> audioData;
 			audioData.Append(voicevoxResult.GetWaveData().get(), voicevoxResult.GetWaveSize());
-			RuntimeAudioImporterLibrary2->ImportAudioFromBuffer(audioData, ERuntimeAudioFormat::Wav);
+			RuntimeAudioImporterLibrary->ImportAudioFromBuffer(audioData, ERuntimeAudioFormat::Wav);
 			audioData.Reset();
 
-			UE_LOG(LogTemp, Log, TEXT("UVoiceVoxComponent::Play"));
+			VOICEVOX_PLAYER_COMMUNICATOR_LOG(TEXT("Play"));
 		}
 	);
 }
 
-void UVoiceVoxComponent::OnAudioImporterResultNative(URuntimeAudioImporterLibrary* importer, UImportedSoundWave* importedSoundWave, ERuntimeImportStatus status)
+void UVoicevoxPlayerComponent::OnAudioImporterResultNative(URuntimeAudioImporterLibrary* importer, UImportedSoundWave* importedSoundWave, ERuntimeImportStatus status)
 {
 	if (importedSoundWave != nullptr && ERuntimeImportStatus::SuccessfulImport == status)
 	{
@@ -100,19 +108,23 @@ void UVoiceVoxComponent::OnAudioImporterResultNative(URuntimeAudioImporterLibrar
 			AudioComponent = FAudioDevice::CreateComponent(importedSoundWave, createParameter);
 			if (AudioComponent)
 			{
+				AudioComponent->SetWorldTransform(GetComponentTransform());
 				AudioComponent->SetVolumeMultiplier(5);
-				//AudioComponent->SetPitchMultiplier(2);
+				if (PitchMultiplier != 1.f)
+					AudioComponent->SetPitchMultiplier(PitchMultiplier);
 				AudioComponent->Play();
 			}
 		}
 
 		mProcessing = false;
 
-		UE_LOG(LogTemp, Log, TEXT("UVoiceVoxComponent::OnAudioImporterResultNative"));
+		VOICEVOX_PLAYER_COMMUNICATOR_LOG(TEXT("OnAudioImporterResultNative"));
 	}
 }
 
-bool UVoiceVoxComponent::IsPlaying() const
+bool UVoicevoxPlayerComponent::IsPlaying() const
 {
-	return mProcessing == false && IsValid(AudioComponent) && AudioComponent->IsPlaying();
+	if (IsValid(AudioComponent) && AudioComponent->IsPlaying())
+		return true;
+	return mProcessing == true;
 }

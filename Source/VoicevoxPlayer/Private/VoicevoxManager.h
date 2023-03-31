@@ -6,6 +6,12 @@
 #include <queue>
 #include <string>
 
+DECLARE_LOG_CATEGORY_EXTERN(VoicevoxPlayer, Log, All);
+
+#define VOICEVOX_PLAYER_COMMUNICATOR_ERROR(Format, ...)		UE_LOG(VoicevoxPlayer, Error, Format, __VA_ARGS__)
+#define VOICEVOX_PLAYER_COMMUNICATOR_WARNING(Format, ...)	UE_LOG(VoicevoxPlayer, Warning, Format, __VA_ARGS__)
+#define VOICEVOX_PLAYER_COMMUNICATOR_LOG(Format, ...)		UE_LOG(VoicevoxPlayer, Log, Format, __VA_ARGS__)
+
 namespace voicevox
 {
 	// 前方宣言
@@ -70,12 +76,6 @@ namespace voicevox
 		\return		trueならば初期化済み
 		*/
 		bool IsInitialized() const noexcept;
-
-		/*
-		テキストの変換を要求します
-		処理結果はstd::future<Result>から取得することができます。
-		*/
-		std::future<Result> Request(const std::string& message, const VoicevoxTtsOptions& ttsOptions, std::function<void(const Result&)> callback = nullptr);
 
 		/*
 		テキストの変換を要求します
