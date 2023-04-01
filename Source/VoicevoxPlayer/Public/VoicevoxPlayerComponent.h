@@ -17,6 +17,7 @@ namespace voicevox
 
 /*
 Voicevoxの話者
+TODO:話者のIDが正しくない可能性があります。正確な情報を探して定義してください
 */
 UENUM(BlueprintType)
 enum class VocevoxSpeakerId : uint8
@@ -95,32 +96,34 @@ protected:
 	/*
 	話者番号
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VoicevoxPlayer")
 		VocevoxSpeakerId SpeakerId = VocevoxSpeakerId::Zundamon_Normal;
 
 	/*
 	音量に乗算する値
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VoicevoxPlayer", meta = (ClampMin = "0"))
 		float VolumeMultiplier = 4.f;
 
 	/*
 	ピッチに乗算する値
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "VoicevoxPlayer", meta = (ClampMin = "0"))
 		float PitchMultiplier = 1.f;
 
 	/*
 	音声再生
 	*/
-	UPROPERTY(BlueprintReadOnly)
-		TObjectPtr<UAudioComponent> AudioComponent;
+	UPROPERTY(BlueprintReadOnly, Category = "VoicevoxPlayer")
+		UAudioComponent* AudioComponent;
+	//TObjectPtr<UAudioComponent> AudioComponent;
 
 	/*
 	ランタイム音声データインポーター
 	*/
 	UPROPERTY()
-		TObjectPtr<URuntimeAudioImporterLibrary> RuntimeAudioImporterLibrary;
+		URuntimeAudioImporterLibrary* RuntimeAudioImporterLibrary;
+	//TObjectPtr<URuntimeAudioImporterLibrary> RuntimeAudioImporterLibrary;
 
 	/*
 	ランタイム音声データインポートイベント

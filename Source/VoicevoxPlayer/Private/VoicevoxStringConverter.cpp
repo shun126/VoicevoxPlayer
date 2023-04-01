@@ -1,8 +1,10 @@
 /*
-ワイド文字をUTF-8文字に変換するクラス
+繝ｯ繧､繝画枚蟄励ｒUTF-8譁�蟄励↓螟画鋤縺吶ｋ繧ｯ繝ｩ繧ｹ
 */
 
 #include "VoicevoxStringConverter.h"
+
+#include <Windows/AllowWindowsPlatformTypes.h>
 #include <windows.h>
 
 namespace voicevox
@@ -23,3 +25,5 @@ namespace voicevox
 		}
 	}
 }
+
+#include <Windows/HideWindowsPlatformTypes.h>

@@ -1,8 +1,10 @@
 
 #pragma once
 #include "../ThirdParty/voicevox_core/voicevox_core.h"
+#include <Logging\LogMacros.h>
 #include <future>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <string>
 
@@ -23,6 +25,7 @@ namespace voicevox
 	class Result final
 	{
 	public:
+		Result() = default;
 		Result(const uint8_t* wav, const size_t size, const VoicevoxResultCode resultCode);
 		Result(const Result& other);
 		Result(Result&& other) noexcept;
@@ -36,8 +39,8 @@ namespace voicevox
 
 	private:
 		std::shared_ptr<uint8_t> mWav;
-		size_t mSize;
-		VoicevoxResultCode mVoicevoxResultCode;
+		size_t mSize = 0;
+		VoicevoxResultCode mVoicevoxResultCode = VoicevoxResultCode::VOICEVOX_RESULT_OK;
 	};
 
 	/*

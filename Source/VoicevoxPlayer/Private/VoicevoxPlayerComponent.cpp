@@ -6,6 +6,8 @@ https://github.com/VOICEVOX/voicevox_core/tree/main/example/cpp/windows
 #include "VoicevoxPlayerComponent.h"
 #include "VoicevoxManager.h"
 #include "VoicevoxStringConverter.h"
+#include "BuildInfomation.h"
+#include "PluginInfomation.h"
 #include <AudioDevice.h>
 #include <Kismet/GameplayStatics.h>
 
