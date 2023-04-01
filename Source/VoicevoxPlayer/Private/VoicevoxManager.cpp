@@ -145,7 +145,7 @@ namespace voicevox
 		request->mSpeakerId = speakerId;
 		request->mCallback = callback;
 
-		std::lock_guard lock(mRequestQueueMutex);
+		std::lock_guard<std::mutex> lock(mRequestQueueMutex);
 		mRequestQueue.push(request);
 		mConditionVariable.notify_one();
 
@@ -164,7 +164,7 @@ namespace voicevox
 
 			std::shared_ptr<voicevox::Request> request;
 			{
-				std::lock_guard lock(mRequestQueueMutex);
+				std::lock_guard<std::mutex> lock(mRequestQueueMutex);
 				request = mRequestQueue.front();
 				mRequestQueue.pop();
 			}

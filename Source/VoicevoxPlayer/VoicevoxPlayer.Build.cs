@@ -105,7 +105,7 @@ public class VoicevoxPlayer : ModuleRules
 
         if (!sourceDirectory.Exists)
         {
-            throw new System.IO.DirectoryNotFoundException($"Source directory not found: {sourceDirectory.FullName}");
+            throw new System.IO.DirectoryNotFoundException("Source directory not found: " + sourceDirectory.FullName);
         }
 
         if (!destinationDirectory.Exists)

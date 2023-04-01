@@ -6,7 +6,7 @@ namespace voicevox
 	namespace windows
 	{
 		/*
-		ƒƒCƒh•¶š‚ğUTF-8•¶š‚É•ÏŠ·‚·‚éƒNƒ‰ƒX
+		ãƒ¯ã‚¤ãƒ‰æ–‡å­—ã‚’UTF-8æ–‡å­—ã«å¤‰æ›ã™ã‚‹ã‚¯ãƒ©ã‚¹
 		*/
 		class ToUTF8 final
 		{
@@ -17,21 +17,21 @@ namespace voicevox
 
 		public:
 			/*
-			ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-			ƒƒCƒh•¶š‚ğUTF-8•¶š‚É•ÏŠ·‚µ‚Ü‚·
-			\param[in]	text	ƒƒCƒh•¶š‚Ö‚Ìƒ|ƒCƒ“ƒ^
+			ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+			ãƒ¯ã‚¤ãƒ‰æ–‡å­—ã‚’UTF-8æ–‡å­—ã«å¤‰æ›ã—ã¾ã™
+			\param[in]	text	ãƒ¯ã‚¤ãƒ‰æ–‡å­—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 			*/
 			explicit ToUTF8(const wchar_t* text);
 
 			/*
-			UTF-8•¶š‚ğæ“¾‚µ‚Ü‚·
-			\return		UTF-8•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+			UTF-8æ–‡å­—ã‚’å–å¾—ã—ã¾ã™
+			\return		UTF-8æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 			*/
 			const char* Get() const;
 
 			/*
-			UTF-8•¶š‚ğæ“¾‚µ‚Ü‚·
-			\return		UTF-8•¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+			UTF-8æ–‡å­—ã‚’å–å¾—ã—ã¾ã™
+			\return		UTF-8æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 			*/
 			operator const char* () const;
 

@@ -35,17 +35,17 @@ Voicevoxを使ったテキスト読み上げを行うUnrealEngineのプラグイ
 * [Release](https://github.com/gtreshchev/RuntimeAudioImporter/releases)から「RuntimeAudioImporter{バージョン名}.zip」をダウンロードし、展開します。
 * プロジェクトの`Plugins`フォルダに`RuntimeAudioImporter`フォルダをコピーして下さい。
 
-# 🔧 必要な環境
-* [Unreal Engine 5.1.1 or Unreal Engine 4.27.2](https://www.unrealengine.com/)
-* [Visual Studio 2022](https://visualstudio.microsoft.com/)
-
-# 📜 ライセンス
-* MIT
-
 # 謝辞
 
 * VoicevoxとHiroshibaさんには、テキスト読み上げを身近にしていただいたことに感謝します。
 * Runtime Audio ImporterとGeorgy Treshchevさんには、簡単に音声ファイルを再生できるようにしてくださったことに感謝します。
+
+# 🔧 Requirements
+* [Unreal Engine 4.27.2 ~ 5.1.1](https://www.unrealengine.com/)
+* [Visual Studio 2022](https://visualstudio.microsoft.com/)
+
+# 📜 License
+* MIT
 
 # 👾 Authors
 * [Shun Moriya](https://twitter.com/moriya_zx25r)
