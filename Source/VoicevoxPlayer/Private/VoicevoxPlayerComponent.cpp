@@ -56,7 +56,10 @@ void UVoicevoxPlayerComponent::BeginPlay()
 	);
 
 	// 音声変換完了イベントの登録
-	RuntimeAudioImportResult = RuntimeAudioImporterLibrary->OnResultNative.AddUObject(this, &UVoicevoxPlayerComponent::OnAudioImporterResultNative);
+	if (IsValid(RuntimeAudioImporterLibrary))
+	{
+		RuntimeAudioImportResult = RuntimeAudioImporterLibrary->OnResultNative.AddUObject(this, &UVoicevoxPlayerComponent::OnAudioImporterResultNative);
+	}
 }
 
 void UVoicevoxPlayerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
